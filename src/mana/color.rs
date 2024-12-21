@@ -1,7 +1,7 @@
 use chumsky::prelude::*;
 use std::fmt::Display;
 
-#[derive(Clone, Copy, PartialEq, Debug)]
+#[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub enum Color {
     White,
     Blue,

@@ -1,3 +1,4 @@
+use super::Color::*;
 use super::ManaCost;
 use super::ManaSymbol::*;
 
@@ -30,4 +31,37 @@ impl From<&ManaCost> for ManaValue {
             .sum();
         Self(value)
     }
+}
+
+#[test]
+fn converts_mana_value() {
+    // Ajani, Sleeper Agent
+    assert_eq!(
+        ManaValue::from(&ManaCost(vec![
+            Generic(1),
+            Colored(Green),
+            PhyrexianHybrid(Green, White),
+            Colored(White)
+        ])),
+        ManaValue(4)
+    );
+    // Altered Ego
+    assert_eq!(
+        ManaValue::from(&ManaCost(vec![
+            Placeholder('X'),
+            Generic(2),
+            Colored(Green),
+            Colored(Blue),
+        ])),
+        ManaValue(4)
+    );
+    // Advice from the Fae
+    assert_eq!(
+        ManaValue::from(&ManaCost(vec![
+            HybridGeneric(Blue, 2),
+            HybridGeneric(Blue, 2),
+            HybridGeneric(Blue, 2),
+        ])),
+        ManaValue(6)
+    );
 }

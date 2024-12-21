@@ -5,7 +5,7 @@ use std::{
     str::FromStr,
 };
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq)]
 pub enum ManaSymbol {
     Placeholder(char), // X, Y
     Generic(usize),

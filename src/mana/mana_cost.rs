@@ -4,9 +4,10 @@ use chumsky::prelude::*;
 use std::fmt::Display;
 use std::str::FromStr;
 
+use Color::*;
 use ManaSymbol::*;
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ManaCost(pub Vec<ManaSymbol>);
 
 impl ManaCost {
@@ -56,4 +57,28 @@ impl FromStr for ManaCost {
             .parse(s)
             .map_err(|_| "Error parsing mana cost".to_owned())
     }
+}
+
+#[test]
+fn test_mana_costs() {
+    // Ajani, Sleeper Agent
+    assert_eq!(
+        ManaCost::from_str("{1}{G}{G/W/P}{W}").unwrap(),
+        ManaCost(vec![
+            Generic(1),
+            Colored(Green),
+            PhyrexianHybrid(Green, White),
+            Colored(White)
+        ])
+    );
+    // Altered Ego
+    assert_eq!(
+        ManaCost::from_str("{X}{2}{G}{U}").unwrap(),
+        ManaCost(vec![
+            Placeholder('X'),
+            Generic(2),
+            Colored(Green),
+            Colored(Blue),
+        ])
+    );
 }
