@@ -41,7 +41,7 @@ impl TryFrom<Vec<ManaSymbol>> for ManaCost {
     type Error = String;
     fn try_from(value: Vec<ManaSymbol>) -> Result<Self, Self::Error> {
         if value.is_empty() {
-            return Err("Mana costs with no symbols are not allowed!".to_owned());
+            return Err("Mana costs with zero symbols are not allowed!".to_owned());
         }
         Ok(Self(value))
     }

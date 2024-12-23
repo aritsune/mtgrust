@@ -1,4 +1,4 @@
-use mtgrust::card::test_serialize;
+use mtgrust::card_data::test_serialize;
 
 fn main() {
     for x in test_serialize() {
