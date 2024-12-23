@@ -25,7 +25,7 @@ impl Display for CreatureType {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, PartialOrd, Ord)]
 pub enum MaybePlaceholderNumber {
     Placeholder,
     Number(i32),

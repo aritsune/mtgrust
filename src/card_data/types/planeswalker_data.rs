@@ -1,6 +1,9 @@
 use std::fmt::Display;
 
 use serde::{Deserialize, Serialize};
+use serde_with::{serde_as, DisplayFromStr};
+
+use super::creature_data::MaybePlaceholderNumber;
 
 static PLANESWALKER_TYPES: &str = include_str!("planeswalker_types.txt");
 
@@ -22,9 +25,11 @@ impl Display for PlaneswalkerType {
     }
 }
 
-#[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize)]
+#[serde_as]
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct PlaneswalkerData {
-    #[serde(skip_serializing)]
+    #[serde(skip)]
     pub planeswalker_types: Vec<PlaneswalkerType>,
-    pub loyalty: usize,
+    #[serde_as(as = "DisplayFromStr")]
+    pub loyalty: MaybePlaceholderNumber,
 }
