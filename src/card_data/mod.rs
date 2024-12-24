@@ -1,19 +1,15 @@
 use crate::mana::ManaCost;
 use enum_kinds::EnumKind;
 use serde::{Deserialize, Serialize};
-use serde_with::{serde_as, DisplayFromStr, FromInto};
 
 mod card_serde;
 mod tests;
-mod types;
-use card_serde::FlatCardTypeData;
+pub mod types;
 
-pub use types::artifact_data::{ArtifactData, ArtifactSubtype};
-pub use types::creature_data::{CreatureData, CreatureType};
-pub use types::enchantment_data::{EnchantmentData, EnchantmentType};
-pub use types::land_data::{LandData, LandType};
-pub use types::planeswalker_data::{PlaneswalkerData, PlaneswalkerType};
-pub use types::tribal_data::TribalData;
+use types::{
+    ArtifactData, ArtifactSubtype, CreatureData, CreatureType, EnchantmentData, EnchantmentType,
+    LandData, LandType, PlaneswalkerData, PlaneswalkerType, TribalData,
+};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub enum CardSupertype {
@@ -45,6 +41,8 @@ pub enum CardTypeData {
     Battle,
 }
 
+use card_serde::FlatCardTypeData;
+use serde_with::{serde_as, DisplayFromStr, FromInto};
 #[serde_as]
 #[derive(Debug, Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]

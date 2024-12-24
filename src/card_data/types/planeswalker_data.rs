@@ -3,7 +3,7 @@ use std::fmt::Display;
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr};
 
-use super::creature_data::MaybePlaceholderNumber;
+use super::MaybePlaceholderNumber;
 
 static PLANESWALKER_TYPES: &str = include_str!("planeswalker_types.txt");
 

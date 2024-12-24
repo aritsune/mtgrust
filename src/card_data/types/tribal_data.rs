@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 
-use crate::card_data::CreatureType;
+use super::CreatureType;
 
 #[derive(Debug, Default, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct TribalData {
