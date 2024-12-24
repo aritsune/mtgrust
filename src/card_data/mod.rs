@@ -1,8 +1,10 @@
 use crate::mana::ManaCost;
+use enum_kinds::EnumKind;
 use serde::{Deserialize, Serialize};
 use serde_with::{serde_as, DisplayFromStr, FromInto};
 
 mod card_serde;
+mod tests;
 mod types;
 use card_serde::FlatCardTypeData;
 
@@ -20,16 +22,17 @@ pub enum CardSupertype {
     Snow,
 }
 
-#[derive(
-    Debug,
-    Clone,
-    Serialize,
-    Deserialize,
-    strum_macros::Display,
-    strum_macros::EnumString,
-    strum_macros::EnumIter,
-)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(untagged)]
+#[derive(EnumKind)]
+#[enum_kind(
+    CardType,
+    derive(
+        strum_macros::EnumIter,
+        strum_macros::EnumString,
+        strum_macros::Display
+    )
+)]
 pub enum CardTypeData {
     Land(LandData),
     Creature(CreatureData),
