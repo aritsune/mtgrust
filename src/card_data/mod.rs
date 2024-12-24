@@ -8,7 +8,7 @@ pub mod types;
 
 use types::{
     ArtifactData, ArtifactSubtype, CreatureData, CreatureType, EnchantmentData, EnchantmentType,
-    LandData, LandType, PlaneswalkerData, PlaneswalkerType, TribalData,
+    InstantData, LandData, LandType, PlaneswalkerData, PlaneswalkerType, SorceryData, TribalData,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -32,8 +32,8 @@ pub enum CardSupertype {
 pub enum CardTypeData {
     Land(LandData),
     Creature(CreatureData),
-    Instant,
-    Sorcery,
+    Instant(InstantData),
+    Sorcery(SorceryData),
     Artifact(ArtifactData),
     Enchantment(EnchantmentData),
     Tribal(TribalData),

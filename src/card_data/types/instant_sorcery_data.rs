@@ -1,3 +1,6 @@
+use serde::{Deserialize, Serialize};
+
+#[derive(Debug, Clone, Serialize, Deserialize, strum_macros::Display)]
 pub enum SpellType {
     Adventure,
     Arcane,
@@ -5,10 +8,12 @@ pub enum SpellType {
     Trap,
 }
 
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct InstantData {
-    spell_types: Vec<SpellType>,
+    pub spell_types: Vec<SpellType>,
 }
 
+#[derive(Debug, Default, Clone, Serialize, Deserialize)]
 pub struct SorceryData {
-    spell_types: Vec<SpellType>,
+    pub spell_types: Vec<SpellType>,
 }

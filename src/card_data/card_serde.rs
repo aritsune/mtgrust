@@ -7,7 +7,8 @@ use crate::card_data::{
 };
 
 use super::{
-    ArtifactData, CardData, CardType, CardTypeData, CreatureData, EnchantmentData, LandData,
+    types::{InstantData, SorceryData},
+    ArtifactData, CardType, CardTypeData, CreatureData, EnchantmentData, LandData,
     PlaneswalkerData, TribalData,
 };
 
@@ -34,7 +35,7 @@ impl From<FlatCardTypeData> for Vec<CardTypeData> {
     }
 }
 
-#[derive(Serialize, Clone)]
+#[derive(Serialize, Clone, Default)]
 pub struct FlatCardTypeData {
     types: Vec<String>,
     subtypes: Vec<String>,
@@ -50,20 +51,15 @@ pub struct FlatCardTypeData {
     tribal_data: Option<TribalData>,
     #[serde(flatten)]
     planeswalker_data: Option<PlaneswalkerData>,
+    #[serde(flatten)]
+    instant_data: Option<InstantData>,
+    #[serde(flatten)]
+    sorcery_data: Option<SorceryData>,
 }
 
 impl From<Vec<CardTypeData>> for FlatCardTypeData {
     fn from(val: Vec<CardTypeData>) -> Self {
-        let mut output = Self {
-            types: vec![],
-            subtypes: vec![],
-            land_data: None,
-            creature_data: None,
-            artifact_data: None,
-            enchantment_data: None,
-            tribal_data: None,
-            planeswalker_data: None,
-        };
+        let mut output = Self::default();
         for type_data in val {
             let name = CardType::from(&type_data).to_string();
             output.types.push(name);
@@ -88,7 +84,6 @@ impl From<Vec<CardTypeData>> for FlatCardTypeData {
                     );
                     output.creature_data = Some(creature_data);
                 }
-                //CardTypeData::Instant | CardTypeData::Sorcery => {}
                 CardTypeData::Artifact(artifact_data) => {
                     output.subtypes.extend(
                         artifact_data
@@ -129,7 +124,29 @@ impl From<Vec<CardTypeData>> for FlatCardTypeData {
                     );
                     output.planeswalker_data = Some(planeswalker_data);
                 }
-                CardTypeData::Instant | CardTypeData::Sorcery | CardTypeData::Battle => {}
+                CardTypeData::Instant(instant_data) => {
+                    output.subtypes.extend(
+                        instant_data
+                            .spell_types
+                            .iter()
+                            .map(|pt| pt.to_string())
+                            .collect::<Vec<_>>(),
+                    );
+                    output.instant_data = Some(instant_data);
+                }
+                CardTypeData::Sorcery(sorcery_data) => {
+                    output.subtypes.extend(
+                        sorcery_data
+                            .spell_types
+                            .iter()
+                            .map(|pt| pt.to_string())
+                            .collect::<Vec<_>>(),
+                    );
+                    output.sorcery_data = Some(sorcery_data);
+                }
+                CardTypeData::Battle => {
+                    todo!()
+                }
             };
         }
         output
@@ -144,23 +161,14 @@ impl<'de> Deserialize<'de> for FlatCardTypeData {
         use de::Error;
         use CardType::*;
 
-        // todo: generalize with visitor?
+        // TODO: generalize with visitor?
         let json: serde_json::value::Value = serde_json::value::Value::deserialize(deserializer)?;
         let type_values = json
             .get("types")
             .and_then(|t| t.as_array())
             .ok_or(Error::custom("types array not found"))?;
 
-        let mut output = Self {
-            types: vec![],
-            subtypes: vec![],
-            land_data: None,
-            creature_data: None,
-            artifact_data: None,
-            enchantment_data: None,
-            tribal_data: None,
-            planeswalker_data: None,
-        };
+        let mut output = Self::default();
         let subtypes = json
             .get("subtypes")
             .and_then(|v| v.as_array())
