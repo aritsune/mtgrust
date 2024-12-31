@@ -141,15 +141,15 @@ impl<'de> Deserialize<'de> for FlatCardTypeData {
         let mut used_subtypes: Vec<&str> = vec![];
         // Macro for repetitive code to extract subtypes from type data
         macro_rules! de_type_data {
-            ($datatype:ty:$name:ident.$subtypes:ident = $getter:expr) => {{
-                let mut types: $datatype = serde_json::from_value(json.clone()).map_err(|e| {
+            ($datatype:ty:$getter:expr => $name:ident.$subtypes:ident) => {{
+                let mut data: $datatype = serde_json::from_value(json.clone()).map_err(|e| {
                     Error::custom(format!(
                         "failed to deserialize {}: {}",
                         stringify!($datatype),
                         e,
                     ))
                 })?;
-                types.$subtypes = subtypes
+                data.$subtypes = subtypes
                     .iter()
                     .flat_map(|i| {
                         if let Some(subtype) = $getter(i) {
@@ -160,7 +160,7 @@ impl<'de> Deserialize<'de> for FlatCardTypeData {
                         }
                     })
                     .collect::<Vec<_>>();
-                output.$name = Some(types);
+                output.$name = Some(data);
             }};
         }
         for type_name in type_values {
@@ -171,23 +171,30 @@ impl<'de> Deserialize<'de> for FlatCardTypeData {
             output.types.push(card_type.to_string());
             match card_type {
                 Land => {
-                    de_type_data! { LandData: land_data.land_types = to_option(LandType::from_str) }
+                    de_type_data! { LandData: to_option(LandType::from_str) => land_data.land_types }
                 }
                 Creature => {
-                    de_type_data! { CreatureData: creature_data.creature_types = CreatureType::new_validated }
+                    de_type_data! { CreatureData: CreatureType::new_validated => creature_data.creature_types }
                 }
                 Artifact => {
-                    de_type_data! { ArtifactData: artifact_data.artifact_types = to_option(ArtifactSubtype::from_str) }
+                    de_type_data! { ArtifactData: to_option(ArtifactSubtype::from_str) => artifact_data.artifact_types }
                 }
                 Enchantment => {
-                    de_type_data! { EnchantmentData: enchantment_data.enchantment_types = to_option(EnchantmentType::from_str) }
+                    de_type_data! { EnchantmentData: to_option(EnchantmentType::from_str) => enchantment_data.enchantment_types }
                 }
                 Planeswalker => {
-                    de_type_data! { PlaneswalkerData: planeswalker_data.planeswalker_types = PlaneswalkerType::new_validated }
+                    de_type_data! { PlaneswalkerData: PlaneswalkerType::new_validated => planeswalker_data.planeswalker_types }
+                }
+                Tribal => {
+                    de_type_data! { TribalData: CreatureType::new_validated => tribal_data.tribal_types }
+                }
+                Instant => {
+                    de_type_data! { InstantData: to_option(SpellType::from_str) => instant_data.spell_types }
+                }
+                Sorcery => {
+                    de_type_data! { SorceryData: to_option(SpellType::from_str) => sorcery_data.spell_types }
                 }
                 Battle => todo!(),
-                Tribal => todo!(),
-                Instant | Sorcery => {}
             }
         }
 
