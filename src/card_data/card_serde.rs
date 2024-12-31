@@ -63,8 +63,8 @@ impl From<Vec<CardTypeData>> for FlatCardTypeData {
     fn from(val: Vec<CardTypeData>) -> Self {
         let mut output = Self::default();
         macro_rules! extract_type_data {
-            ($data:ident.$subtypes:ident -> $out:expr) => {{
-                $out.extend(
+            ($data:ident.$subtypes:ident) => {{
+                output.subtypes.extend(
                     $data
                         .$subtypes
                         .iter()
@@ -78,31 +78,31 @@ impl From<Vec<CardTypeData>> for FlatCardTypeData {
             output.types.push(name);
             match type_data {
                 CardTypeData::Land(data) => {
-                    extract_type_data! { data.land_types -> output.subtypes }
+                    extract_type_data! { data.land_types }
                 }
                 CardTypeData::Creature(data) => {
-                    extract_type_data! { data.creature_types -> output.subtypes }
+                    extract_type_data! { data.creature_types }
                 }
                 CardTypeData::Artifact(data) => {
-                    extract_type_data! { data.artifact_types -> output.subtypes }
+                    extract_type_data! { data.artifact_types }
                 }
                 CardTypeData::Enchantment(data) => {
-                    extract_type_data! { data.enchantment_types -> output.subtypes }
+                    extract_type_data! { data.enchantment_types }
                 }
                 CardTypeData::Tribal(data) => {
-                    extract_type_data! { data.tribal_types -> output.subtypes }
+                    extract_type_data! { data.tribal_types }
                 }
                 CardTypeData::Planeswalker(data) => {
-                    extract_type_data! { data.planeswalker_types -> output.subtypes }
+                    extract_type_data! { data.planeswalker_types }
                 }
                 CardTypeData::Instant(data) => {
-                    extract_type_data! { data.spell_types -> output.subtypes }
+                    extract_type_data! { data.spell_types }
                 }
                 CardTypeData::Sorcery(data) => {
-                    extract_type_data! { data.spell_types -> output.subtypes }
+                    extract_type_data! { data.spell_types }
                 }
-                CardTypeData::Battle => {
-                    todo!()
+                CardTypeData::Battle(data) => {
+                    extract_type_data! { data.battle_types }
                 }
             };
         }
