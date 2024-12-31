@@ -7,8 +7,9 @@ mod tests;
 pub mod types;
 
 use types::{
-    ArtifactData, ArtifactSubtype, CreatureData, CreatureType, EnchantmentData, EnchantmentType,
-    InstantData, LandData, LandType, PlaneswalkerData, PlaneswalkerType, SorceryData, TribalData,
+    ArtifactData, ArtifactSubtype, BattleData, CreatureData, CreatureType, EnchantmentData,
+    EnchantmentType, InstantData, LandData, LandType, PlaneswalkerData, PlaneswalkerType,
+    SorceryData, TribalData,
 };
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -38,7 +39,7 @@ pub enum CardTypeData {
     Enchantment(EnchantmentData),
     Tribal(TribalData),
     Planeswalker(PlaneswalkerData),
-    Battle,
+    Battle(BattleData),
 }
 
 use card_serde::FlatCardTypeData;

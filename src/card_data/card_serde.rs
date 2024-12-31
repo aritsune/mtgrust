@@ -2,14 +2,14 @@ use serde::{de, Deserialize, Serialize};
 use std::str::FromStr;
 use strum::IntoEnumIterator;
 
-use crate::card_data::{
-    ArtifactSubtype, CreatureType, EnchantmentType, LandType, PlaneswalkerType,
+use crate::card_data::types::{
+    ArtifactSubtype, BattleType, CreatureType, EnchantmentType, LandType, PlaneswalkerType,
+    SpellType,
 };
 
 use super::{
-    types::{InstantData, SorceryData},
-    ArtifactData, CardType, CardTypeData, CreatureData, EnchantmentData, LandData,
-    PlaneswalkerData, TribalData,
+    ArtifactData, BattleData, CardType, CardTypeData, CreatureData, EnchantmentData, InstantData,
+    LandData, PlaneswalkerData, SorceryData, TribalData,
 };
 
 impl From<FlatCardTypeData> for Vec<CardTypeData> {
@@ -55,6 +55,8 @@ pub struct FlatCardTypeData {
     instant_data: Option<InstantData>,
     #[serde(flatten)]
     sorcery_data: Option<SorceryData>,
+    #[serde(flatten)]
+    battle_data: Option<BattleData>,
 }
 
 impl From<Vec<CardTypeData>> for FlatCardTypeData {
@@ -194,7 +196,9 @@ impl<'de> Deserialize<'de> for FlatCardTypeData {
                 Sorcery => {
                     de_type_data! { SorceryData: to_option(SpellType::from_str) => sorcery_data.spell_types }
                 }
-                Battle => todo!(),
+                Battle => {
+                    de_type_data! { BattleData: to_option(BattleType::from_str) => battle_data.battle_types }
+                }
             }
         }
 

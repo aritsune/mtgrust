@@ -1,4 +1,5 @@
 mod artifact_data;
+mod battle_data;
 mod creature_data;
 mod enchantment_data;
 mod instant_sorcery_data;
@@ -9,6 +10,7 @@ mod tribal_data;
 use std::{fmt::Display, str::FromStr};
 
 pub use artifact_data::{ArtifactData, ArtifactSubtype};
+pub use battle_data::{BattleData, BattleType};
 pub use creature_data::{CreatureData, CreatureType};
 pub use enchantment_data::{EnchantmentData, EnchantmentType};
 pub use instant_sorcery_data::{InstantData, SorceryData, SpellType};
