@@ -57,21 +57,20 @@ pub struct FlatCardTypeData {
     sorcery_data: Option<SorceryData>,
 }
 
-macro_rules! extract_type_data {
-    ($data:ident.$subtypes:ident -> $out:expr) => {{
-        $out.extend(
-            $data
-                .$subtypes
-                .iter()
-                .map(|lt| lt.to_string())
-                .collect::<Vec<_>>(),
-        )
-    }};
-}
-
 impl From<Vec<CardTypeData>> for FlatCardTypeData {
     fn from(val: Vec<CardTypeData>) -> Self {
         let mut output = Self::default();
+        macro_rules! extract_type_data {
+            ($data:ident.$subtypes:ident -> $out:expr) => {{
+                $out.extend(
+                    $data
+                        .$subtypes
+                        .iter()
+                        .map(|lt| lt.to_string())
+                        .collect::<Vec<_>>(),
+                )
+            }};
+        }
         for type_data in val {
             let name = CardType::from(&type_data).to_string();
             output.types.push(name);
