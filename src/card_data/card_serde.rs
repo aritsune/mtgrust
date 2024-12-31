@@ -108,6 +108,13 @@ impl From<Vec<CardTypeData>> for FlatCardTypeData {
     }
 }
 
+fn to_option<T, A, E, F: FnOnce(A) -> Result<T, E>>(f: F) -> impl FnOnce(A) -> Option<T> {
+    |a: A| {
+        let x = f(a);
+        x.ok()
+    }
+}
+
 impl<'de> Deserialize<'de> for FlatCardTypeData {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
     where
