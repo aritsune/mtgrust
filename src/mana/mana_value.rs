@@ -1,4 +1,3 @@
-use super::Color::*;
 use super::ManaCost;
 use super::ManaSymbol::*;
 
@@ -35,6 +34,7 @@ impl From<&ManaCost> for ManaValue {
 
 #[test]
 fn converts_mana_value() {
+    use super::Color::*;
     // Ajani, Sleeper Agent
     assert_eq!(
         ManaValue::from(&ManaCost(vec![

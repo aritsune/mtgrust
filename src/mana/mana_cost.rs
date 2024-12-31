@@ -4,7 +4,6 @@ use chumsky::prelude::*;
 use std::fmt::Display;
 use std::str::FromStr;
 
-use Color::*;
 use ManaSymbol::*;
 
 #[derive(Debug, Clone, PartialEq)]
@@ -61,6 +60,7 @@ impl FromStr for ManaCost {
 
 #[test]
 fn test_mana_costs() {
+    use Color::*;
     // Ajani, Sleeper Agent
     assert_eq!(
         ManaCost::from_str("{1}{G}{G/W/P}{W}").unwrap(),

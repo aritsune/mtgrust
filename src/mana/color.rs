@@ -38,12 +38,7 @@ impl TryFrom<char> for Color {
 
 pub fn color_parser() -> impl Parser<char, Color, Error = Simple<char>> {
     any().try_map(|c, span| {
-        Color::try_from(c).map_err(|_| {
-            Simple::expected_input_found(
-                span,
-                vec![Some('W'), Some('U'), Some('B'), Some('R'), Some('G')],
-                Some(c),
-            )
-        })
+        Color::try_from(c)
+            .map_err(|_| Simple::expected_input_found(span, "WUBRG".chars().map(Some), Some(c)))
     })
 }
