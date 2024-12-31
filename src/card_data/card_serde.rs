@@ -63,47 +63,36 @@ impl From<Vec<CardTypeData>> for FlatCardTypeData {
     fn from(val: Vec<CardTypeData>) -> Self {
         let mut output = Self::default();
         macro_rules! extract_type_data {
-            ($data:ident.$subtypes:ident -> $out:expr) => {{
-                $out.extend(
-                    $data
-                        .$subtypes
-                        .iter()
-                        .map(|lt| lt.to_string())
-                        .collect::<Vec<_>>(),
-                )
+            ($type_data:expr => $($type:path: $subtypes:ident,)+) => {{
+                match $type_data {
+                $(
+                    $type(data) => {
+                        output.subtypes.extend(
+                            data
+                                .$subtypes
+                                .iter()
+                                .map(|lt| lt.to_string())
+                                .collect::<Vec<_>>(),
+                        )
+                    }
+                )+
+                }
             }};
         }
         for type_data in val {
             let name = CardType::from(&type_data).to_string();
             output.types.push(name);
-            match type_data {
-                CardTypeData::Land(data) => {
-                    extract_type_data! { data.land_types -> output.subtypes }
-                }
-                CardTypeData::Creature(data) => {
-                    extract_type_data! { data.creature_types -> output.subtypes }
-                }
-                CardTypeData::Artifact(data) => {
-                    extract_type_data! { data.artifact_types -> output.subtypes }
-                }
-                CardTypeData::Enchantment(data) => {
-                    extract_type_data! { data.enchantment_types -> output.subtypes }
-                }
-                CardTypeData::Tribal(data) => {
-                    extract_type_data! { data.tribal_types -> output.subtypes }
-                }
-                CardTypeData::Planeswalker(data) => {
-                    extract_type_data! { data.planeswalker_types -> output.subtypes }
-                }
-                CardTypeData::Instant(data) => {
-                    extract_type_data! { data.spell_types -> output.subtypes }
-                }
-                CardTypeData::Sorcery(data) => {
-                    extract_type_data! { data.spell_types -> output.subtypes }
-                }
-                CardTypeData::Battle => {
-                    todo!()
-                }
+            extract_type_data! {
+                type_data =>
+                    CardTypeData::Land: land_types,
+                    CardTypeData::Creature: creature_types,
+                    CardTypeData::Artifact: artifact_types,
+                    CardTypeData::Enchantment: enchantment_types,
+                    CardTypeData::Tribal: tribal_types,
+                    CardTypeData::Planeswalker: planeswalker_types,
+                    CardTypeData::Instant: spell_types,
+                    CardTypeData::Sorcery: spell_types,
+                    CardTypeData::Battle: battle_types,
             };
         }
         output
