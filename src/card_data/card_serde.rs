@@ -139,6 +139,30 @@ impl<'de> Deserialize<'de> for FlatCardTypeData {
             .map(|s| s.as_str().unwrap().to_owned())
             .collect::<Vec<_>>();
         let mut used_subtypes: Vec<&str> = vec![];
+        // Macro for repetitive code to extract subtypes from type data
+        macro_rules! de_type_data {
+            ($datatype:ty:$name:ident.$subtypes:ident = $getter:expr) => {{
+                let mut types: $datatype = serde_json::from_value(json.clone()).map_err(|e| {
+                    Error::custom(format!(
+                        "failed to deserialize {}: {}",
+                        stringify!($datatype),
+                        e,
+                    ))
+                })?;
+                types.$subtypes = subtypes
+                    .iter()
+                    .flat_map(|i| {
+                        if let Some(subtype) = $getter(i) {
+                            used_subtypes.push(i);
+                            Some(subtype)
+                        } else {
+                            None
+                        }
+                    })
+                    .collect::<Vec<_>>();
+                output.$name = Some(types);
+            }};
+        }
         for type_name in type_values {
             let card_type = type_name
                 .as_str()
@@ -147,98 +171,19 @@ impl<'de> Deserialize<'de> for FlatCardTypeData {
             output.types.push(card_type.to_string());
             match card_type {
                 Land => {
-                    let mut land_data: LandData =
-                        serde_json::from_value(json.clone()).map_err(|e| {
-                            Error::custom(format!("failed to deserialize land data: {}", e))
-                        })?;
-                    land_data.land_types = subtypes
-                        .iter()
-                        .flat_map(|i| {
-                            if let Ok(ty) = LandType::from_str(i) {
-                                used_subtypes.push(i);
-                                Some(ty)
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<Vec<_>>();
-                    output.land_data = Some(land_data);
+                    de_type_data! { LandData: land_data.land_types = to_option(LandType::from_str) }
                 }
                 Creature => {
-                    let mut creature_data: CreatureData = serde_json::from_value(json.clone())
-                        .map_err(|e| {
-                            Error::custom(format!("failed to deserialize creature data: {}", e))
-                        })?;
-                    let creature_types = subtypes
-                        .iter()
-                        .flat_map(|i| {
-                            if let Some(ty) = CreatureType::new_validated(i) {
-                                used_subtypes.push(i);
-                                Some(ty)
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<Vec<_>>();
-                    creature_data.creature_types = creature_types;
-                    output.creature_data = Some(creature_data);
+                    de_type_data! { CreatureData: creature_data.creature_types = CreatureType::new_validated }
                 }
                 Artifact => {
-                    let mut artifact_data: ArtifactData = serde_json::from_value(json.clone())
-                        .map_err(|e| {
-                            Error::custom(format!("failed to deserialize artifact data: {}", e))
-                        })?;
-                    let artifact_types = subtypes
-                        .iter()
-                        .flat_map(|i| {
-                            if let Ok(ty) = ArtifactSubtype::from_str(i) {
-                                used_subtypes.push(i);
-                                Some(ty)
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<Vec<_>>();
-                    artifact_data.artifact_types = artifact_types;
-                    output.artifact_data = Some(artifact_data);
+                    de_type_data! { ArtifactData: artifact_data.artifact_types = to_option(ArtifactSubtype::from_str) }
                 }
                 Enchantment => {
-                    let mut enchantment_data: EnchantmentData =
-                        serde_json::from_value(json.clone()).map_err(|e| {
-                            Error::custom(format!("failed to deserialize enchantment data: {}", e))
-                        })?;
-                    let enchantment_types = subtypes
-                        .iter()
-                        .flat_map(|i| {
-                            if let Ok(ty) = EnchantmentType::from_str(i) {
-                                used_subtypes.push(i);
-                                Some(ty)
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<Vec<_>>();
-                    enchantment_data.enchantment_types = enchantment_types;
-                    output.enchantment_data = Some(enchantment_data);
+                    de_type_data! { EnchantmentData: enchantment_data.enchantment_types = to_option(EnchantmentType::from_str) }
                 }
                 Planeswalker => {
-                    let mut planeswalker_data: PlaneswalkerData =
-                        serde_json::from_value(json.clone()).map_err(|e| {
-                            Error::custom(format!("failed to deserialize planeswalker data: {}", e))
-                        })?;
-                    let planeswalker_types = subtypes
-                        .iter()
-                        .flat_map(|i| {
-                            if let Some(ty) = PlaneswalkerType::new_validated(i) {
-                                used_subtypes.push(i);
-                                Some(ty)
-                            } else {
-                                None
-                            }
-                        })
-                        .collect::<Vec<_>>();
-                    planeswalker_data.planeswalker_types = planeswalker_types;
-                    output.planeswalker_data = Some(planeswalker_data);
+                    de_type_data! { PlaneswalkerData: planeswalker_data.planeswalker_types = PlaneswalkerType::new_validated }
                 }
                 Battle => todo!(),
                 Tribal => todo!(),
